@@ -24,8 +24,9 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/wolframbeta1/proxmox-gho
 
 | Parameter        | Value               |
 |------------------|---------------------|
-| Hostname         | ghostfolio          |
-| Root Password    | ghostfolio123        |
+| LXC Name         | ghostfolio          |
+| user             | root          |
+| Root Password    | root                |
 | Disk Size        | 8 GB                |
 | RAM Size         | 2048 MB             |
 | CPU Cores        | 2                   |
