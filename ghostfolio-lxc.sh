@@ -18,7 +18,7 @@ NEXTID=$(pvesh get /cluster/nextid)
 CTID=${CTID:-$NEXTID}
 
 CONTAINER_NAME="Ghostfolio"
-PASSWORD=${PASSWORD:-root123} # Container root password
+PASSWORD=${PASSWORD:-rootpw1} # Container root password, mindestens 5 Zeichen!
 DISK_SIZE=${DISK_SIZE:-8}
 RAM_SIZE=${RAM_SIZE:-2048}
 CPU_CORES=${CPU_CORES:-2}
@@ -66,7 +66,7 @@ pct exec $CTID -- bash -c "\
     apt install -y nodejs && \
     sudo -u postgres psql -c \"CREATE USER ghostfolio WITH PASSWORD 'ghostfolio';\" && \
     sudo -u postgres psql -c \"CREATE DATABASE ghostfolio OWNER ghostfolio;\" && \
-    git clone --depth 1 https://github.com/ghostfolio/ghostfolio.git /opt/ghostfolio
+    git clone --depth 1 https://github.com/ghostfolio/ghostfolio.git /opt/ghostfolio && \
     cd /opt/ghostfolio && \
     cp .env.example .env && \
     sed -i \"s|DATABASE_URL=.*|DATABASE_URL=postgresql://ghostfolio:ghostfolio@localhost:5432/ghostfolio|g\" .env && \
@@ -82,7 +82,7 @@ IP=$(pct exec $CTID -- hostname -I | awk '{print $1}')
 echo -e "${GN}\nInstallation Completed Successfully!${CL}"
 echo -e "Access Ghostfolio at: ${BL}http://$IP:3333${CL}  (ab v2.170: Port 3333!)"
 echo -e "Container Name: ${YW}$CONTAINER_NAME${CL}"
-echo -e "Root Login: ${YW}root${CL} / Password: ${YW}root${CL} (per pct enter oder SSH, NICHT Ghostfolio!)"
+echo -e "Root Login: ${YW}root${CL} / Password: ${YW}rootpw1${CL} (per pct enter oder SSH, NICHT Ghostfolio!)"
 echo -e "Ghostfolio App Login (Default): ${YW}admin@ghostfol.io${CL} / Password: ${YW}admin${CL}"
 echo -e "Disk Size: ${YW}${DISK_SIZE}GB${CL}"
 echo -e "RAM Size: ${YW}${RAM_SIZE}MB${CL}"
