@@ -19,11 +19,11 @@ IPV4=${IPV4:-dhcp}                      # IPv4 (use dhcp or static)
 
 TEMPLATE="ubuntu-22.04-standard_22.04-1_amd64.tar.zst"
 
-### --- CHECK TEMPLATE --- ###
-if ! pveam available | grep -q "$TEMPLATE"; then
-  echo "[ERROR] Template $TEMPLATE not found. Please download it manually using:"
-  echo "pveam update && pveam download local $TEMPLATE"
-  exit 1
+### --- CHECK AND DOWNLOAD TEMPLATE --- ###
+if ! pveam list local | grep -q "$TEMPLATE"; then
+  echo "[INFO] Template not found locally. Attempting to download..."
+  pveam update
+  pveam download local $TEMPLATE
 fi
 
 ### --- CREATE LXC --- ###
