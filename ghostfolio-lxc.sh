@@ -18,7 +18,7 @@ NEXTID=$(pvesh get /cluster/nextid)
 CTID=${CTID:-$NEXTID}
 
 CONTAINER_NAME="Ghostfolio"
-PASSWORD=${PASSWORD:-root} # Container root password
+PASSWORD=${PASSWORD:-root123} # Container root password
 DISK_SIZE=${DISK_SIZE:-8}
 RAM_SIZE=${RAM_SIZE:-2048}
 CPU_CORES=${CPU_CORES:-2}
