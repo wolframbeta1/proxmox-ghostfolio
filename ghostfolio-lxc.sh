@@ -5,7 +5,10 @@
 set -e
 
 ### --- CONFIG --- ###
-CTID=${CTID:-110}                      # Default Container ID
+# Find next available CTID
+NEXTID=$(pvesh get /cluster/nextid)
+CTID=${CTID:-$NEXTID}
+
 HOSTNAME=${HOSTNAME:-ghostfolio}        # Default Hostname
 PASSWORD=${PASSWORD:-ghostfolio123}     # Default root password
 DISK_SIZE=${DISK_SIZE:-8}               # Disk Size in GB
@@ -16,10 +19,14 @@ IPV4=${IPV4:-dhcp}                      # IPv4 (use dhcp or static)
 
 TEMPLATE="ubuntu-22.04-standard_22.04-1_amd64.tar.zst"
 
-### --- CREATE LXC --- ###
-echo "[INFO] Downloading LXC template..."
-pct template local download ubuntu-22.04 || true
+### --- CHECK TEMPLATE --- ###
+if ! pveam available | grep -q "$TEMPLATE"; then
+  echo "[ERROR] Template $TEMPLATE not found. Please download it manually using:"
+  echo "pveam update && pveam download local $TEMPLATE"
+  exit 1
+fi
 
+### --- CREATE LXC --- ###
 echo "[INFO] Creating LXC container (CTID: $CTID)"
 pct create $CTID local:vztmpl/$TEMPLATE \
     --hostname $HOSTNAME \
