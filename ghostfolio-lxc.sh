@@ -41,6 +41,7 @@ if ! pveam list local | grep -q "$TEMPLATE"; then
 fi
 msg_ok "Template ready"
 
+msg_info "Verwende Root Passwort: $PASSWORD"
 msg_info "Creating LXC Container (CTID: $CTID)"
 pct create $CTID local:vztmpl/$TEMPLATE \
     --hostname $CONTAINER_NAME \
