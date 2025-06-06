@@ -18,7 +18,7 @@ NEXTID=$(pvesh get /cluster/nextid)
 CTID=${CTID:-$NEXTID}
 
 CONTAINER_NAME="Ghostfolio"
-PASSWORD=${PASSWORD:-root123} # Container root password
+PASSWORD=${PASSWORD:-root} # Container root password
 DISK_SIZE=${DISK_SIZE:-8}
 RAM_SIZE=${RAM_SIZE:-2048}
 CPU_CORES=${CPU_CORES:-2}
@@ -28,7 +28,8 @@ IPV4=${IPV4:-dhcp}
 TEMPLATE="ubuntu-22.04-standard_22.04-1_amd64.tar.zst"
 
 msg_info "Validating Storage"
-if ! pvesm status -content rootdir >/dev/null; then msg_error "No valid container storage found."; exit 1; fi
+STORAGE=$(pvesm status -content rootdir | awk 'NR==2{print $1}')
+if [ -z "$STORAGE" ]; then msg_error "No valid container storage found."; exit 1; fi
 if ! pvesm status -content vztmpl >/dev/null; then msg_error "No valid template storage found."; exit 1; fi
 msg_ok "Storage validated"
 
@@ -45,7 +46,7 @@ pct create $CTID local:vztmpl/$TEMPLATE \
     --hostname $CONTAINER_NAME \
     --cores $CPU_CORES \
     --memory $RAM_SIZE \
-    --rootfs local-lvm:$DISK_SIZE \
+    --rootfs $STORAGE:$DISK_SIZE \
     --net0 name=eth0,bridge=$BRIDGE,ip=$IPV4 \
     --features nesting=1,keyctl=1 \
     --unprivileged 1 \
