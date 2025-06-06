@@ -66,7 +66,7 @@ pct exec $CTID -- bash -c "\
     apt install -y nodejs && \
     sudo -u postgres psql -c \"CREATE USER ghostfolio WITH PASSWORD 'ghostfolio';\" && \
     sudo -u postgres psql -c \"CREATE DATABASE ghostfolio OWNER ghostfolio;\" && \
-    git clone --branch v2.175.0 --depth 1 https://github.com/ghostfolio/ghostfolio.git /opt/ghostfolio && \
+    git clone --depth 1 https://github.com/ghostfolio/ghostfolio.git /opt/ghostfolio
     cd /opt/ghostfolio && \
     cp .env.example .env && \
     sed -i \"s|DATABASE_URL=.*|DATABASE_URL=postgresql://ghostfolio:ghostfolio@localhost:5432/ghostfolio|g\" .env && \
