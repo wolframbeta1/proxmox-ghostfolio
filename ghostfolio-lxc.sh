@@ -9,22 +9,21 @@ set -e
 NEXTID=$(pvesh get /cluster/nextid)
 CTID=${CTID:-$NEXTID}
 
-HOSTNAME=${HOSTNAME:-ghostfolio}        # Default Hostname
-PASSWORD=${PASSWORD:-ghostfolio123}     # Default root password
-DISK_SIZE=${DISK_SIZE:-8}               # Disk Size in GB
-RAM_SIZE=${RAM_SIZE:-2048}              # Memory in MB
-CPU_CORES=${CPU_CORES:-2}               # CPU Cores
-BRIDGE=${BRIDGE:-vmbr0}                 # Network Bridge
-IPV4=${IPV4:-dhcp}                      # IPv4 (use dhcp or static)
+HOSTNAME=${HOSTNAME:-ghostfolio}
+PASSWORD=${PASSWORD:-ghostfolio123}
+DISK_SIZE=${DISK_SIZE:-8}
+RAM_SIZE=${RAM_SIZE:-2048}
+CPU_CORES=${CPU_CORES:-2}
+BRIDGE=${BRIDGE:-vmbr0}
+IPV4=${IPV4:-dhcp}
 
-TEMPLATENAME="ubuntu-22.04-standard_22.04"
-TEMPLATE="$TEMPLATENAME-1_amd64.tar.zst"
+TEMPLATE="ubuntu-22.04-standard_22.04-1_amd64.tar.zst"
 
 ### --- CHECK AND DOWNLOAD TEMPLATE --- ###
 if ! pveam list local | grep -q "$TEMPLATE"; then
   echo "[INFO] Template not found locally. Attempting to download..."
   pveam update
-  pveam download local $TEMPLATENAME
+  pveam download local "$TEMPLATE"
 fi
 
 ### --- CREATE LXC --- ###
