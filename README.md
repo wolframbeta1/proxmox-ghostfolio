@@ -24,7 +24,6 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/wolframbeta1/proxmox-gho
 
 | Parameter        | Value               |
 |------------------|---------------------|
-| CTID             | 110                 |
 | Hostname         | ghostfolio          |
 | Root Password    | ghostfolio123        |
 | Disk Size        | 8 GB                |
