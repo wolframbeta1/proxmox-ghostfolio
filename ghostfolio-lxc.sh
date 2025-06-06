@@ -2,10 +2,38 @@
 
 # Ghostfolio LXC Auto-Installer for Proxmox VE
 
-set -e
+# Colors
+YW=$(echo "\033[33m")
+GN=$(echo "\033[1;92m")
+RD=$(echo "\033[01;31m")
+BL=$(echo "\033[36m")
+CL=$(echo "\033[m")
 
-### --- CONFIG --- ###
-# Find next available CTID
+# Icons
+CM="\t✔️\t${CL}"
+CROSS="\t✖️\t${CL}"
+INFO="\t💡\t${CL}"
+
+set -Eeuo pipefail
+trap 'error_handler $LINENO "$BASH_COMMAND"' ERR
+
+function error_handler() {
+  printf "\n${RD}[ERROR]${CL} in line ${RD}$1${CL}: Command ${YW}$2${CL}\n"
+  exit 1
+}
+
+function msg_info() {
+  echo -e "${YW}[INFO]${CL} $1"
+}
+
+function msg_ok() {
+  echo -e "${GN}[OK]${CL} $1"
+}
+
+function msg_error() {
+  echo -e "${RD}[ERROR]${CL} $1"
+}
+
 NEXTID=$(pvesh get /cluster/nextid)
 CTID=${CTID:-$NEXTID}
 
@@ -19,16 +47,26 @@ IPV4=${IPV4:-dhcp}
 
 TEMPLATE="ubuntu-22.04-standard_22.04-1_amd64.tar.zst"
 
-### --- CHECK AND DOWNLOAD TEMPLATE --- ###
+msg_info "Validating Storage"
+if ! pvesm status -content rootdir >/dev/null; then
+  msg_error "No valid container storage found."
+  exit 1
+fi
+if ! pvesm status -content vztmpl >/dev/null; then
+  msg_error "No valid template storage found."
+  exit 1
+fi
+msg_ok "Storage validated"
+
+msg_info "Checking Template"
 if ! pveam list local | grep -q "$TEMPLATE"; then
-  echo "[INFO] Template not found locally. Attempting to download..."
+  msg_info "Template not found locally. Downloading..."
   pveam update
   pveam download local "$TEMPLATE"
 fi
+msg_ok "Template ready"
 
-
-### --- CREATE LXC --- ###
-echo "[INFO] Creating LXC container (CTID: $CTID)"
+msg_info "Creating LXC Container (CTID: $CTID)"
 pct create $CTID local:vztmpl/$TEMPLATE \
     --hostname $HOSTNAME \
     --cores $CPU_CORES \
@@ -38,14 +76,14 @@ pct create $CTID local:vztmpl/$TEMPLATE \
     --features nesting=1,keyctl=1 \
     --unprivileged 1 \
     --password $PASSWORD
+msg_ok "Container created"
 
-### --- START LXC --- ###
-echo "[INFO] Starting container..."
+msg_info "Starting Container"
 pct start $CTID
 sleep 5
+msg_ok "Container started"
 
-### --- INSTALL GHOSTFOLIO --- ###
-echo "[INFO] Installing Ghostfolio inside container..."
+msg_info "Installing Ghostfolio inside Container"
 pct exec $CTID -- bash -c "\
     apt update && apt upgrade -y && \
     apt install -y curl git build-essential postgresql && \
@@ -62,11 +100,11 @@ pct exec $CTID -- bash -c "\
     npm install -g pm2 && \
     pm2 start npm --name ghostfolio -- run start && \
     pm2 startup systemd && pm2 save"
+msg_ok "Ghostfolio installed"
 
-### --- INFO --- ###
 IP=$(pct exec $CTID -- hostname -I | awk '{print $1}')
-echo "\n[INFO] Ghostfolio Installation Completed!"
-echo "[INFO] Access Ghostfolio at: http://$IP:3000"
-echo "[INFO] Default PostgreSQL User: ghostfolio"
-echo "[INFO] Default PostgreSQL Password: ghostfolio"
-echo "[INFO] Container root password: $PASSWORD"
+echo -e "${GN}\nInstallation Completed Successfully!${CL}"
+echo -e "Access Ghostfolio at: ${BL}http://$IP:3000${CL}"
+echo -e "PostgreSQL User: ${YW}ghostfolio${CL}"
+echo -e "PostgreSQL Password: ${YW}ghostfolio${CL}"
+echo -e "Container root password: ${YW}$PASSWORD${CL}"
