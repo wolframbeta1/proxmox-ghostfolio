@@ -17,8 +17,8 @@ CPU_CORES=${CPU_CORES:-2}               # CPU Cores
 BRIDGE=${BRIDGE:-vmbr0}                 # Network Bridge
 IPV4=${IPV4:-dhcp}                      # IPv4 (use dhcp or static)
 
-TEMPLATE="ubuntu-22.04-standard_22.04-1_amd64.tar.zst"
-TEMPLATENAME="ubuntu-22.04-standard"
+TEMPLATENAME="ubuntu-22.04-standard_22.04"
+TEMPLATE="$TEMPLATENAME-1_amd64.tar.zst"
 
 ### --- CHECK AND DOWNLOAD TEMPLATE --- ###
 if ! pveam list local | grep -q "$TEMPLATE"; then
