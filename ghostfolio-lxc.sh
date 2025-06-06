@@ -37,7 +37,7 @@ function msg_error() {
 NEXTID=$(pvesh get /cluster/nextid)
 CTID=${CTID:-$NEXTID}
 
-HOSTNAME=${HOSTNAME:-ghostfolio}
+CONTAINER_NAME="Ghostfolio"
 PASSWORD=${PASSWORD:-ghostfolio123}
 DISK_SIZE=${DISK_SIZE:-8}
 RAM_SIZE=${RAM_SIZE:-2048}
@@ -68,7 +68,7 @@ msg_ok "Template ready"
 
 msg_info "Creating LXC Container (CTID: $CTID)"
 pct create $CTID local:vztmpl/$TEMPLATE \
-    --hostname $HOSTNAME \
+    --hostname $CONTAINER_NAME \
     --cores $CPU_CORES \
     --memory $RAM_SIZE \
     --rootfs local-lvm:$DISK_SIZE \
@@ -105,6 +105,10 @@ msg_ok "Ghostfolio installed"
 IP=$(pct exec $CTID -- hostname -I | awk '{print $1}')
 echo -e "${GN}\nInstallation Completed Successfully!${CL}"
 echo -e "Access Ghostfolio at: ${BL}http://$IP:3000${CL}"
-echo -e "PostgreSQL User: ${YW}ghostfolio${CL}"
-echo -e "PostgreSQL Password: ${YW}ghostfolio${CL}"
-echo -e "Container root password: ${YW}$PASSWORD${CL}"
+echo -e "Container Name: ${YW}$CONTAINER_NAME${CL}"
+echo -e "Root Password: ${YW}$PASSWORD${CL}"
+echo -e "Disk Size: ${YW}${DISK_SIZE}GB${CL}"
+echo -e "RAM Size: ${YW}${RAM_SIZE}MB${CL}"
+echo -e "CPU Cores: ${YW}$CPU_CORES${CL}"
+echo -e "Network Bridge: ${YW}$BRIDGE${CL}"
+echo -e "IP Address: ${YW}$IP${CL}"
