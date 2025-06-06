@@ -87,7 +87,7 @@ msg_info "Installing Ghostfolio inside Container"
 pct exec $CTID -- bash -c "\
     apt update && apt upgrade -y && \
     apt install -y curl git build-essential postgresql && \
-    curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+    curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
     apt install -y nodejs && \
     sudo -u postgres psql -c \"CREATE USER ghostfolio WITH PASSWORD 'ghostfolio';\" && \
     sudo -u postgres psql -c \"CREATE DATABASE ghostfolio OWNER ghostfolio;\" && \
@@ -96,7 +96,7 @@ pct exec $CTID -- bash -c "\
     cp .env.example .env && \
     sed -i \"s|DATABASE_URL=.*|DATABASE_URL=postgresql://ghostfolio:ghostfolio@localhost:5432/ghostfolio|g\" .env && \
     sed -i \"s|NEXTAUTH_SECRET=.*|NEXTAUTH_SECRET=$(openssl rand -hex 32)|g\" .env && \
-    npm install && npm run build && \
+    npm install && \
     npm install -g pm2 && \
     pm2 start npm --name ghostfolio -- run start && \
     pm2 startup systemd && pm2 save"
