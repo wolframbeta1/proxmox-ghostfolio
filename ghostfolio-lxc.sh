@@ -26,6 +26,7 @@ if ! pveam list local | grep -q "$TEMPLATE"; then
   pveam download local "$TEMPLATE"
 fi
 
+
 ### --- CREATE LXC --- ###
 echo "[INFO] Creating LXC container (CTID: $CTID)"
 pct create $CTID local:vztmpl/$TEMPLATE \
