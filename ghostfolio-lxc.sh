@@ -14,6 +14,23 @@ function msg_info() { echo -e "${YW}[INFO]${CL} $1"; }
 function msg_ok() { echo -e "${GN}[OK]${CL} $1"; }
 function msg_error() { echo -e "${RD}[ERROR]${CL} $1"; }
 
+# Storage interaktiv auswählen wie im tteck-Example
+function select_storage() {
+  local CONTENT="$1"
+  local STORAGE
+  PS3="Bitte Storage für $CONTENT auswählen: "
+  mapfile -t STORAGE_LIST < <(pvesm status -content $CONTENT | awk 'NR>1{print $1}')
+  select opt in "${STORAGE_LIST[@]}"; do
+    if [[ -n "$opt" ]]; then
+      STORAGE="$opt"
+      break
+    else
+      echo "Ungültige Auswahl."
+    fi
+  done
+  echo "$STORAGE"
+}
+
 NEXTID=$(pvesh get /cluster/nextid)
 CTID=${CTID:-$NEXTID}
 
@@ -24,30 +41,30 @@ RAM_SIZE=${RAM_SIZE:-2048}
 CPU_CORES=${CPU_CORES:-2}
 BRIDGE=${BRIDGE:-vmbr0}
 IPV4=${IPV4:-dhcp}
-
 TEMPLATE="ubuntu-22.04-standard_22.04-1_amd64.tar.zst"
 
 msg_info "Validating Storage"
-STORAGE=$(pvesm status -content rootdir | awk 'NR==2{print $1}')
-if [ -z "$STORAGE" ]; then msg_error "No valid container storage found."; exit 1; fi
-if ! pvesm status -content vztmpl >/dev/null; then msg_error "No valid template storage found."; exit 1; fi
+CONTAINER_STORAGE=$(select_storage rootdir)
+if [ -z "$CONTAINER_STORAGE" ]; then msg_error "No valid container storage found."; exit 1; fi
+TEMPLATE_STORAGE=$(select_storage vztmpl)
+if [ -z "$TEMPLATE_STORAGE" ]; then msg_error "No valid template storage found."; exit 1; fi
 msg_ok "Storage validated"
 
 msg_info "Checking Template"
-if ! pveam list local | grep -q "$TEMPLATE"; then
+if ! pveam list "$TEMPLATE_STORAGE" | grep -q "$TEMPLATE"; then
   msg_info "Template not found locally. Downloading..."
   pveam update
-  pveam download local "$TEMPLATE"
+  pveam download "$TEMPLATE_STORAGE" "$TEMPLATE"
 fi
 msg_ok "Template ready"
 
 msg_info "Verwende Root Passwort: $PASSWORD"
 msg_info "Creating LXC Container (CTID: $CTID)"
-pct create $CTID local:vztmpl/$TEMPLATE \
+pct create $CTID ${TEMPLATE_STORAGE}:vztmpl/$TEMPLATE \
     --hostname $CONTAINER_NAME \
     --cores $CPU_CORES \
     --memory $RAM_SIZE \
-    --rootfs $STORAGE:$DISK_SIZE \
+    --rootfs $CONTAINER_STORAGE:$DISK_SIZE \
     --net0 name=eth0,bridge=$BRIDGE,ip=$IPV4 \
     --features nesting=1,keyctl=1 \
     --unprivileged 1 \
