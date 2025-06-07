@@ -34,14 +34,14 @@ function error_exit() {
   exit $EXIT
 }
 function warn() {
-  local REASON="\e[97m$1\e[39m"
+  local REASON="$1" # Argument is now passed directly
   local FLAG="\e[93m[WARNING]\e[39m"
-  msg "$FLAG "$REASON""
+  msg "$FLAG $REASON" # Corrected argument passing for msg
 }
 function info() {
-  local REASON="$1"
+  local REASON="$1" # Argument is now passed directly
   local FLAG="\e[36m[INFO]\e[39m"
-  msg "$FLAG "$REASON""
+  msg "$FLAG $REASON" # Corrected argument passing for msg
 }
 function msg() {
   local TEXT="$1"
