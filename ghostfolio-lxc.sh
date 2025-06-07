@@ -243,7 +243,11 @@ pct exec "$CTID" -- bash -c "\
     # Install Node.js dependencies and build Ghostfolio
     echo '--- Installing Node.js dependencies and building Ghostfolio ---' && \
     npm install || die 'npm install failed'; \
-    npm run build || die 'npm run build failed'; \
+    # FIX: Use npx nx build commands instead of npm run build
+    npm install -g nx || die 'Failed to install Nx CLI globally.'; \
+    export PATH=\"\$(npm prefix -g)/bin:\$PATH\"; \
+    npx nx build api --configuration=production || die 'Nx build for API failed.'; \
+    npx nx build web --configuration=production || die 'Nx build for Web failed.'; \
     
     # Install PM2 globally and start Ghostfolio
     echo '--- Installing PM2 and starting Ghostfolio service ---' && \
