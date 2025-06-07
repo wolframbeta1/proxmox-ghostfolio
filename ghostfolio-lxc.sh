@@ -21,7 +21,7 @@ EOF
 
 # --- Standard tteck error handling and messaging ---
 set -eEuo pipefail
-shopt -s expand_aliases
+shopt s expand_aliases
 alias die='EXIT=$? LINE=$LINENO error_exit'
 trap die ERR
 function error_exit() {
@@ -97,7 +97,7 @@ function select_storage() {
     CONTENT_LABEL='Container template'
     ;;
   *) false || die "Invalid storage class." ;;
-  eselac
+  esac # <--- Corrected from 'eselac'
 
   # Query all storage locations
   local -a MENU
