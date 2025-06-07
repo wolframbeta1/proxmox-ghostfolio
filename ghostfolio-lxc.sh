@@ -21,7 +21,7 @@ EOF
 
 # --- Standard tteck error handling and messaging ---
 set -eEuo pipefail
-shopt s expand_aliases
+shopt -s expand_aliases # <--- FIX: Added hyphen here!
 alias die='EXIT=$? LINE=$LINENO error_exit'
 trap die ERR
 function error_exit() {
@@ -36,12 +36,12 @@ function error_exit() {
 function warn() {
   local REASON="\e[97m$1\e[39m"
   local FLAG="\e[93m[WARNING]\e[39m"
-  msg "$FLAG $REASON"
+  msg "$FLAG "$REASON""
 }
 function info() {
   local REASON="$1"
   local FLAG="\e[36m[INFO]\e[39m"
-  msg "$FLAG $REASON"
+  msg "$FLAG "$REASON""
 }
 function msg() {
   local TEXT="$1"
@@ -97,7 +97,7 @@ function select_storage() {
     CONTENT_LABEL='Container template'
     ;;
   *) false || die "Invalid storage class." ;;
-  esac # <--- Corrected from 'eselac'
+  esac 
 
   # Query all storage locations
   local -a MENU
